@@ -6,17 +6,6 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 
-"""
-https://cli.github.com
-https://formulae.brew.sh/formula/gh#default
-https://www.youtube.com/watch?v=5rTwOt9Qgik  # uv link
-https://www.youtube.com/watch?v=QPCFnbonpNQ&t=1772s  # pytorch link
-
-gh auth login
-gh repo create pytorch-playground --public --source=. --remote=origin --push
-"""
-
-
 """                     Simple linear regression.                       """
 # Create data points.
 X = np.array(object=[x for x in range(100)], dtype=np.float32)
