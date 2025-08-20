@@ -102,30 +102,50 @@ print(f"'tensor_2d[:, 1]' sliced -->\n{tensor_2d[:, 1]}\n")
 print(f"'tensor_2d[:, 1:2]' sliced -->\n{tensor_2d[:, 1:2]}\n")
 print(f"'tensor_2d[:, 1:]' sliced -->\n{tensor_2d[:, 1:]}\n")
 
-# Add two tensors.
+
+"""                     Tensor math operations.                       """
 tensor_a = torch.tensor([[1, 2], [3, 4]])
 tensor_b = torch.tensor([[5, 6], [7, 8]])
-tensor_c = tensor_a + tensor_b
-tensor_d = torch.add(tensor_a, tensor_b)
 print(f"'tensor_a' values -->\n{tensor_a}\n")
 print(f"'tensor_b' values -->\n{tensor_b}\n")
-print(f"'tensor_c' (regular addition) values -->\n{tensor_c}\n")
-print(f"'tensor_d' (torch.add) values -->\n{tensor_d}\n")
+
+# Add two tensors.
+print(f"'tensor_a + tensor_b' (regular addition) values -->\n{tensor_a + tensor_b}\n")
+print(f"'torch.add(tensor_a, tensor_b)' values -->\n{torch.add(tensor_a, tensor_b)}\n")
+print(f"'tensor_a.add(tensor_b)' values -->\n{tensor_a.add(tensor_b)}\n")
 
 # Subtract two tensors.
-tensor_e = tensor_a - tensor_b
-tensor_f = torch.sub(tensor_a, tensor_b)
-print(f"'tensor_e' (regular subtraction) values -->\n{tensor_e}\n")
-print(f"'tensor_f' (torch.sub) values -->\n{tensor_f}\n")
+print(f"'tensor_a - tensor_b' (regular subtraction) values -->\n{tensor_a - tensor_b}\n")
+print(f"'torch.sub(tensor_a, tensor_b)' values -->\n{torch.sub(tensor_a, tensor_b)}\n")
+print(f"'tensor_a.sub(tensor_b)' values -->\n{tensor_a.sub(tensor_b)}\n")
 
 # Multiply two tensors.
-tensor_g = tensor_a * tensor_b
-tensor_h = torch.mul(tensor_a, tensor_b)
-print(f"'tensor_g' (regular multiplication) values -->\n{tensor_g}\n")
-print(f"'tensor_h' (torch.mul) values -->\n{tensor_h}\n")
+print(f"'tensor_a * tensor_b' (regular multiplication) values -->\n{tensor_a * tensor_b}\n")
+print(f"'torch.mul(tensor_a, tensor_b)' values -->\n{torch.mul(tensor_a, tensor_b)}\n")
+print(f"'tensor_a.mul(tensor_b)' values -->\n{tensor_a.mul(tensor_b)}\n")
 
 # Divide two tensors.
-tensor_i = tensor_a / tensor_b
-tensor_j = torch.div(tensor_a, tensor_b)
-print(f"'tensor_i' (regular division) values -->\n{tensor_i}\n")
-print(f"'tensor_j' (torch.div) values -->\n{tensor_j}\n")
+print(f"'tensor_a / tensor_b' (regular division) values -->\n{tensor_a / tensor_b}\n")
+print(f"'torch.div(tensor_a, tensor_b)' values -->\n{torch.div(tensor_a, tensor_b)}\n")
+print(f"'tensor_a.div(tensor_b)' values -->\n{tensor_a.div(tensor_b)}\n")
+
+# Remainder of division between two tensors.
+print(f"'tensor_b % tensor_a' (regular remainder) values -->\n{tensor_b % tensor_a}\n")
+print(f"'torch.remainder(tensor_b, tensor_a)' values -->\n{torch.remainder(tensor_b, tensor_a)}\n")
+
+# Exponential of a tensor.
+print(f"'tensor_a ** 2' (regular exponentiation) values -->\n{tensor_a ** 2}\n")
+print(f"'torch.pow(tensor_a, 2)' values -->\n{torch.pow(tensor_a, 2)}\n")
+
+print(f"'tensor_a ** tensor_b' (regular exponentiation) values -->\n{tensor_a ** tensor_b}\n")
+print(f"'torch.pow(tensor_a, tensor_b)' values -->\n{torch.pow(tensor_a, tensor_b)}\n")
+
+# Reassignment of tensors.
+print(f"'tensor_a' values (before reassignment) -->\n{tensor_a}\n")
+print(f"'tensor_b' values (before reassignment) -->\n{tensor_b}\n")
+
+tensor_add = tensor_a.add(tensor_b)
+print(f"'tensor_add' values -->\n{tensor_add}\n")
+
+tensor_a.add_(tensor_b)  # In-place addition
+print(f"'tensor_a' values (after reassignment) -->\n{tensor_a}\n")
