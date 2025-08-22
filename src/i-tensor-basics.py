@@ -10,6 +10,8 @@ https://www.youtube.com/watch?v=5rTwOt9Qgik  # uv link
 https://www.youtube.com/watch?v=QPCFnbonpNQ&t=1772s  # pytorch link
 https://www.youtube.com/playlist?list=PLCC34OHNcOtpcgR9LEYSdi9r7XIbpkpK1  # pytorch link
 
+https://docs.pytorch.org/docs/stable/tensor_attributes.html  # PyTorch tensor attributes/data-types
+
 gh auth login
 gh repo create pytorch-playground --public --source=. --remote=origin --push
 """
