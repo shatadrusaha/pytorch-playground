@@ -24,7 +24,6 @@ MODEL_PATH = os.path.join(FOLDER_ARTIFACTS, 'logistic_regression_model.pth')
 random_seed = 18
 device = torch.device('mps' if torch.backends.mps.is_available() else 'cpu')
 print(f"Using device: '{device}'\n")
-# torch.manual_seed(random_seed)
 
 
 """                     Prepare the dataset.                       """
@@ -89,11 +88,13 @@ optimizer = torch.optim.Adam(
 
 
 """                     Train the model.                       """
-# Number of epochs.
+# Set training and evaluation parameters.
+torch.manual_seed(random_seed)
 num_epochs = 10000
 n = 1000
 threshold = 0.5
 losses = []
+
 
 for epoch in range(num_epochs):
     # Set the model to training mode.
