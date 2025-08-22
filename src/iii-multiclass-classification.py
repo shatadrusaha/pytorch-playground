@@ -5,7 +5,7 @@ import torch.nn.functional as F
 import pandas as pd
 from sklearn.model_selection import train_test_split
 import matplotlib.pyplot as plt
-# import numpy as np
+import os
 
 
 """                     Prepare the dataset.                       """
@@ -38,10 +38,12 @@ y_tensor = torch.LongTensor(y.values)
 
 print(f"X shape (tensor) --> {X_tensor.shape}\ny shape (tensor) --> {y_tensor.shape}\n")
 
-# torch.manual_seed(14)  # For reproducibility
+# Set random seed for reproducibility.
+random_seed = 18
+torch.manual_seed(random_seed)
 
 # Split the dataset into training and test sets
-X_train, X_test, y_train, y_test = train_test_split(X_tensor, y_tensor, test_size=0.2, random_state=18)
+X_train, X_test, y_train, y_test = train_test_split(X_tensor, y_tensor, test_size=0.2, random_state=random_seed)
 print(f"X_train shape --> {X_train.shape}\ny_train shape --> {y_train.shape}\n")
 print(f"X_test shape --> {X_test.shape}\ny_test shape --> {y_test.shape}\n")
 
@@ -105,6 +107,9 @@ n = 50
 losses = []
 
 for epoch in range(num_epochs):
+    # Set the model to training mode.
+    model.train()
+
     # Forward pass.
     y_pred = model.forward(X_train)
     loss = criterion(y_pred, y_train)
@@ -128,3 +133,47 @@ ax.set_title('Loss Curve')
 ax.legend()
 plt.show()
 plt.close(fig)
+
+# Evaluate the model on the test set.
+model.eval()
+with torch.no_grad():
+    # Predict and calculate loss on the test set.
+    y_test_pred = model.forward(X_test)
+    test_loss = criterion(y_test_pred, y_test)
+    print(f"Test Loss: {test_loss.item():.4f}")
+
+    # Find the max across columns (classes) for each row (sample).
+    _, predicted = torch.max(y_test_pred, 1)
+
+    # Calculate accuracy.
+    accuracy = (predicted == y_test).float().mean()
+    print(f"Test Accuracy: {accuracy.item():.4f}\n")
+
+# Make predictions on new data.
+new_data = torch.tensor([[5.1, 3.5, 1.4, 0.2]], dtype=torch.float32)
+model.eval()
+with torch.no_grad():
+    y_new_pred = model.forward(new_data)
+    _, predicted = torch.max(y_new_pred, 1)
+    print(f"Predicted class for new data: {predicted.item()}\n")
+
+# Parameters to save the model.
+name_model = "multi_class_nn.pth"
+folder_artifacts = "artifacts"
+os.makedirs(folder_artifacts, exist_ok=True)
+
+# Save the model.
+torch.save(obj=model.state_dict(), f=os.path.join(folder_artifacts, name_model))
+print(f"Model saved to: '{os.path.join(folder_artifacts, name_model)}'\n")
+
+# Load the model.
+loaded_model = SimpleNN()
+loaded_model.load_state_dict(torch.load(os.path.join(folder_artifacts, name_model)))
+print(f"Model loaded successfully from: '{os.path.join(folder_artifacts, name_model)}'\n")
+
+# Make predictions with the loaded model.
+loaded_model.eval()
+with torch.no_grad():
+    y_new_pred = loaded_model.forward(new_data)
+    _, predicted = torch.max(y_new_pred, 1)
+    print(f"Predicted class for new data: {predicted.item()}")
