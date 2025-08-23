@@ -41,7 +41,7 @@ print(f"'X_train.shape': {X_train.shape}\n'X_test.shape': {X_test.shape}\n")
 
 # Create custom 'Dataset' class.
 class CustomDataset(Dataset):
-    def __init__(self, features, labels):
+    def __init__(self, features, labels, device='cpu'):
         # features  --> X
         # labels    --> y
         self.features = torch.tensor(features, dtype=torch.float32, device=device)
@@ -54,8 +54,8 @@ class CustomDataset(Dataset):
         return self.features[idx], self.labels[idx]
 
 # Create instances of the custom dataset.
-train_dataset = CustomDataset(features=X_train, labels=y_train)
-test_dataset = CustomDataset(features=X_test, labels=y_test)
+train_dataset = CustomDataset(features=X_train, labels=y_train, device=device)
+test_dataset = CustomDataset(features=X_test, labels=y_test, device=device)
 print(f"Length of 'train_dataset': {len(train_dataset)}")
 print(f"Length of 'test_dataset': {len(test_dataset)}\n")
 
