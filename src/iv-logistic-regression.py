@@ -81,15 +81,12 @@ print(model)
 
 # Define the loss function and optimizer.
 criterion = nn.BCELoss()
-optimizer = torch.optim.Adam(
-    params=model.parameters(), 
-    lr=0.001
-)
+optimizer = torch.optim.Adam(params=model.parameters(), lr=0.001)
 
 
 """                     Train the model.                       """
 # Set training and evaluation parameters.
-torch.manual_seed(random_seed)
+torch.manual_seed(seed=random_seed)
 num_epochs = 10000
 n = 1000
 threshold = 0.5
