@@ -9,8 +9,17 @@ import torch.nn.functional as F
 from torch.utils.data import DataLoader
 from torchvision import datasets, transforms
 
+from torchinfo import summary
+
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
+
+"""
+https://www.youtube.com/watch?v=6EJaHBJhwDs&t=1s
+https://www.youtube.com/watch?v=2w0pRriQG3A
+
+https://www.youtube.com/watch?v=CAgWNxlmYsc
+"""
 
 BATCH_SIZE = 64
 random_seed = 18
