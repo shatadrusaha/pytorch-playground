@@ -19,6 +19,8 @@ https://www.youtube.com/watch?v=6EJaHBJhwDs&t=1s
 https://www.youtube.com/watch?v=2w0pRriQG3A
 
 https://www.youtube.com/watch?v=CAgWNxlmYsc
+
+https://docs.pytorch.org/tutorials/intermediate/pinmem_nonblock.html
 """
 
 BATCH_SIZE = 64
