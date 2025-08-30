@@ -6,6 +6,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 from sklearn.model_selection import train_test_split
+from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score, mean_absolute_percentage_error, root_mean_squared_error, explained_variance_score
 
 import torch
 import torch.optim as optim
@@ -183,18 +184,19 @@ print(f"X_test shape: {X_test.shape}\ny_test shape: {y_test.shape}\n")
 """                     ANN model building.                       """
 # Create a PyTorch dataset and dataloader.
 class CustomDataset(Dataset):
-    def __init__(self, features, targets):
-        self.features = torch.tensor(data=features, dtype=torch.float32)
-        self.targets = torch.tensor(data=targets, dtype=torch.float32)
+    def __init__(self, features, labels, device=torch.device('cpu')):
+        self.device = device
+        self.features = torch.tensor(data=features, dtype=torch.float32, device=self.device)
+        self.labels = torch.tensor(data=labels, dtype=torch.float32, device=self.device)
 
     def __len__(self):
-        return len(self.targets)
+        return len(self.labels)
 
     def __getitem__(self, idx):
-        return self.features[idx], self.targets[idx]
+        return self.features[idx], self.labels[idx]
 
-train_dataset = CustomDataset(features=X_train, targets=y_train)
-test_dataset = CustomDataset(features=X_test, targets=y_test)
+train_dataset = CustomDataset(features=X_train, labels=y_train, device=DEVICE)
+test_dataset = CustomDataset(features=X_test, labels=y_test, device=DEVICE)
 
 train_dataloader = DataLoader(dataset=train_dataset, batch_size=BATCH_SIZE, shuffle=True)
 test_dataloader = DataLoader(dataset=test_dataset, batch_size=BATCH_SIZE, shuffle=False)
@@ -248,8 +250,8 @@ def train_model(
         for batch in train_dataloader:
             # Unpack the batch.
             features, targets = batch
-            features = features.to(DEVICE)
-            targets = targets.to(DEVICE)
+            # features = features.to(DEVICE)
+            # targets = targets.to(DEVICE)
 
             # Forward pass.
             preds = model(features)
@@ -274,15 +276,22 @@ def train_model(
     return loss_train
 
 # Create an evaluation loop.
-def evaluate_model(model, test_dataloader, criterion, device=torch.device('cpu')):
+def evaluate_model(
+    model, 
+    test_dataloader, 
+    criterion, 
+    device=torch.device('cpu')
+):
     # Move model to the specified device.
     model.to(device)
 
     # Set the model to evaluation mode.
     model.eval()
 
-    # Track loss for each batch.
+    # Track loss, true and predicted values for each batch.
     loss_epoch = []
+    test_true = []
+    test_pred = []
 
     # Use inference mode for evaluation.
     with torch.inference_mode():
@@ -295,7 +304,34 @@ def evaluate_model(model, test_dataloader, criterion, device=torch.device('cpu')
             loss = criterion(preds, targets)
             loss_epoch.append(loss.item())
 
-    print(f"Test Loss: {np.mean(loss_epoch):.4f}\n")
+            test_true.extend(targets.cpu().numpy().flatten())
+            test_pred.extend(preds.cpu().numpy().flatten())
+
+    # Get the results in a df.
+    df_results = pd.DataFrame(
+        data={'y_true': test_true, 'y_pred': test_pred}
+    )
+    df_results['y_diff'] = df_results['y_true'] - df_results['y_pred']
+    df_results = df_results.round(decimals=4)
+
+    # Calculate and print metrics for test dataset.
+    mae = mean_absolute_error(df_results['y_true'], df_results['y_pred'])
+    mape = mean_absolute_percentage_error(df_results['y_true'], df_results['y_pred'])
+    mse = mean_squared_error(df_results['y_true'], df_results['y_pred'])
+    rmse = root_mean_squared_error(df_results['y_true'], df_results['y_pred'])
+    r2 = r2_score(df_results['y_true'], df_results['y_pred'])
+    evs = explained_variance_score(df_results['y_true'], df_results['y_pred'])
+
+    print("Test set evaluation metrics:")
+    print(f"\tTest Loss: {np.mean(loss_epoch):.4f}")
+    print(f"\tMean Absolute Error: {mae:.4f}")
+    print(f"\tMean Absolute Percentage Error: {mape:.4f}")
+    print(f"\tMean Squared Error: {mse:.4f}")
+    print(f"\tRoot Mean Squared Error: {rmse:.4f}")
+    print(f"\tR^2 Score: {r2:.4f}")
+    print(f"\tExplained Variance Score: {evs:.4f}\n")
+
+    return df_results
 
 # Create a model instance.
 model_nn = ANNModel(in_features=X_train.shape[1], out_features=y_train.shape[1])
@@ -333,10 +369,41 @@ plt.show()
 plt.close(fig)
 
 # Evaluate the model.
-print("Evaluating the model...\n")
-evaluate_model(
+print("Evaluating the model...")
+df_results = evaluate_model(
     model=model_nn,
     test_dataloader=test_dataloader,
     criterion=criterion,
     device=DEVICE
 )
+
+# Plot test predictions vs true values.
+fig, ax = plt.subplots(figsize=(10, 8))
+ax.scatter(x=df_results['y_true'], y=df_results['y_pred'], alpha=0.5)
+ax.plot(
+    [df_results['y_true'].min(), df_results['y_true'].max()], 
+    [df_results['y_true'].min(), df_results['y_true'].max()], 
+    'k--', 
+    lw=2
+)
+ax.set_xlabel(xlabel='True Values')
+ax.set_ylabel(ylabel='Predictions')
+ax.set_title(label='Test Predictions vs True Values')
+plt.tight_layout()
+plt.show()
+plt.close(fig)
+
+# Plot residuals histogram.
+fig, ax = plt.subplots(figsize=(10, 8))
+ax.hist(df_results['y_diff'], bins=5, alpha=0.7, color='blue')
+ax.axvline(x=0, color='k', linestyle='--', lw=2)
+ax.set_xlabel(xlabel='Residuals')
+ax.set_ylabel(ylabel='Frequency')
+ax.set_title(label='Residuals Histogram')
+plt.tight_layout()
+plt.show()
+plt.close(fig)
+
+"""
+df_results['y_diff'].describe(percentiles=[0.25, 0.5, 0.75, 0.9, 0.95, 0.99])
+"""
