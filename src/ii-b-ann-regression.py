@@ -28,6 +28,7 @@ DEVICE = torch.device("mps" if torch.backends.mps.is_available() else "cpu")
 
 """                     Load and preprocess data.                       """
 # https://archive.ics.uci.edu/dataset/275/bike+sharing+dataset
+# https://datagy.io/pytorch-linear-regression/
 
 # Load the dataset.
 bike_sharing = fetch_ucirepo(id=275)
